@@ -10,9 +10,6 @@ tsup.config.ts
 .vscode/
 .idea/
 
-# Documentation interna
-documentacionCristiana.md
-
 # Node modules (no debería incluirse de todos modos)
 node_modules/
 

@@ -5,7 +5,7 @@ import { AtaqueDefensorio, Jugada, Movimientos } from "../types/types";
 import { FiltradoDefensaPrincipal, FiltradoDefensaSecundario, FiltradoRiesgo } from "../utils/Filtrado";
 import { getPiece, getPieceFrom } from "../utils/translators";
 
-export class CortinsChessAlgorithm {
+export class CortinsChessAlgorithmV1 {
 
   private jugadasCalculadas?:Jugada[];
 

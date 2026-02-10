@@ -1,5 +1,5 @@
 // Core - Algoritmo principal
-export { CortinsChessAlgorithm } from './core/CortinsChessAlgorithm';
+export { CortinsChessAlgorithmV1 } from './core/CortinsChessAlgorithmV1';
 
 // Types - Tipos e interfaces
 export {

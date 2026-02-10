@@ -1,84 +1,46 @@
-# Cortins Chess AI
+# ♟️ Cortins Chess AI (v1) — “mi motorcito de ajedrez” 😄
 
-Motor de ajedrez IA basado en el algoritmo Cortins Chess para calcular movimientos estratégicos inteligentes.
+¡Bienvenido/a! Esto es **Cortins Chess AI**, una mini-IA de ajedrez hecha por mí como **entretenimiento** y experimento personal.
 
-## Instalación
+No pretende ser un motor profesional tipo Stockfish ni ganar torneos; la idea es **jugar, aprender y mejorarla poco a poco**.
+
+📌 **Repo:** cortins-05 (GitHub)
+
+🚧 **Estado:** Versión 1 (la iré puliendo y ampliando)
+
+---
+
+## ✨ ¿Qué hace?
+
+* Devuelve un movimiento “decente” según unas heurísticas propias.
+* Incluye un modo de movimiento aleatorio para el “caos controlado”.
+* Usa `chess.js` para gestionar el tablero y validar jugadas.
+
+---
+
+## 📦 Instalación
 
 ```bash
 npm install cortins-chess-ai chess.js
 ```
 
-## Uso
+## 🧑‍💻Uso rápido
 
-```typescript
-import { Chess } from 'chess.js';
-import { CortinsChessAlgorithm } from 'cortins-chess-ai';
+```php
+import { Chess } from "chess.js";
+import { CortinsChessAlgorithm } from "cortins-chess-ai";
 
-// Crear una instancia del juego
+// Crear una partida
 const chess = new Chess();
 
-// Crear el algoritmo (especifica el color del rival: 'w' para blancas, 'b' para negras)
-const ai = new CortinsChessAlgorithm('w');
+// Crear la IA (le indicamos el color del rival)
+const ai = new CortinsChessAlgorithm("w");
 
-// Obtener el mejor movimiento calculado por el algoritmo
-const bestMove = ai.cortinsMove(chess);
-console.log('Mejor movimiento:', bestMove);
+// Obtener un movimiento propuesto por la IA
+const move = ai.cortinsMove(chess);
 
-// Aplicar el movimiento
-chess.move(bestMove);
+console.log("Movimiento sugerido:", move);
+
+// Aplicar el movimiento al tablero
+chess.move(move);
 ```
-
-## API
-
-### `CortinsChessAlgorithm`
-
-Clase principal que implementa el algoritmo de IA.
-
-#### Constructor
-
-```typescript
-new CortinsChessAlgorithm(colorRival: 'w' | 'b')
-```
-
-- `colorRival`: El color del jugador rival ('w' para blancas, 'b' para negras)
-
-#### Métodos
-
-##### `cortinsMove(chess: Chess): string`
-
-Calcula y devuelve el mejor movimiento para la posición actual.
-
-##### `randomMove(chess: Chess): string`
-
-Devuelve un movimiento aleatorio válido.
-
-### Tipos exportados
-
-- `DifficultyLevel` - Nivel de dificultad (1 | 2)
-- `PlayerColor` - Color del jugador ('w' | 'b')
-- `Movimientos` - Información sobre movimientos posibles
-- `AtaqueDefensorio` - Datos de ataque/defensa
-- `Jugada` - Representación de una jugada
-
-### Constantes
-
-- `PIECE_VALUE` - Valores de las piezas para evaluación
-
-### Funciones de utilidad
-
-- `primerasJugadasPosibles()` - Calcula jugadas posibles iniciales
-- `defensa()` - Analiza movimientos defensivos
-- `ataque()` - Analiza movimientos de ataque
-- `quedaAtacadaTrasMover()` - Verifica si una pieza queda atacada
-- `movimientoValido()` - Valida un movimiento
-- `ordenarPorCalidadPieza()` - Ordena piezas por valor
-- `FiltradoRiesgo()` - Filtra movimientos por riesgo
-
-## Requisitos
-
-- Node.js >= 16.0.0
-- chess.js ^1.0.0 (peer dependency)
-
-## Licencia
-
-MIT

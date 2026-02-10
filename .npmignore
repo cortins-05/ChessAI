@@ -1,0 +1,27 @@
+# Source files
+src/
+tsconfig.json
+tsup.config.ts
+
+# Development files
+*.log
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Documentation interna
+documentacionCristiana.md
+
+# Node modules (no debería incluirse de todos modos)
+node_modules/
+
+# Test files
+__tests__/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Build configs
+.eslintrc*
+.prettierrc*

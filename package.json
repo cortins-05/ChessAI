@@ -1,28 +1,54 @@
 {
-  "name": "chess-ai",
-  "version": "0.1.0",
+  "name": "cortins-chess-ai",
+  "version": "1.0.0",
+  "description": "Motor de ajedrez IA con el algoritmo Cortins Chess para calcular movimientos estratégicos",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
+    "build": "tsup src/index.ts --format esm --dts --clean",
     "dev": "tsup src/index.ts --format esm --dts --watch",
-    "prepack": "npm run build"
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "chess",
+    "ai",
+    "ajedrez",
+    "chess-engine",
+    "chess.js",
+    "cortins"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "chess.js": "^1.0.0"
   },
   "devDependencies": {
-    "tsup": "^x",
-    "typescript": "^x"
-  },
-  "dependencies": {
-    "chess.js": "^1.4.0"
+    "chess.js": "^1.4.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
   }
 }

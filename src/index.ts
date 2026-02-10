@@ -1,3 +1,38 @@
-export class ChessEngine {
-  constructor() {}
-}
+// Core - Algoritmo principal
+export { CortinsChessAlgorithm } from './core/CortinsChessAlgorithm';
+
+// Types - Tipos e interfaces
+export {
+  type DifficultyLevel,
+  type PlayerColor,
+  type Movimientos,
+  type AtaqueDefensorio,
+  type Jugada,
+  PIECE_VALUE,
+} from './types/types';
+
+// Utils - Funciones auxiliares
+export {
+  primerasJugadasPosibles,
+  defensa,
+  ataque,
+  quedaAtacadaTrasMover,
+  movimientoValido,
+} from './utils/Principales';
+
+export {
+  ordenarPorCalidadPieza,
+  ordenPorRiesgo,
+} from './utils/Ordenamiento';
+
+export {
+  FiltradoRiesgo,
+  FiltradoDefensaPrincipal,
+  FiltradoDefensaSecundario,
+} from './utils/Filtrado';
+
+export {
+  changeToSquare,
+  getPiece,
+  getPieceFrom,
+} from './utils/translators';

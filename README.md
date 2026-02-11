@@ -1,21 +1,24 @@
-# ♟️ Cortins Chess AI (v1) — “mi motorcito de ajedrez” 😄
-
-📜 [Changelog](./CHANGELOG.md)
+# ♟️ Cortins Chess AI (v1)  ♟️
 
 ¡Bienvenido/a! Esto es **Cortins Chess AI**, una mini-IA de ajedrez hecha por mí como **entretenimiento** y experimento personal.
 
-No pretende ser un motor profesional tipo Stockfish ni ganar torneos; la idea es **jugar, aprender y mejorarla poco a poco**.
-
-📌 **Repo:** cortins-05 (GitHub)
-
 🚧 **Estado:** Versión 1 (la iré puliendo y ampliando)
+
+📌 [**Repo**](https://github.com/cortins-05/ChessAI)
+
+📜 [Changelog
 
 ---
 
+## ❗️Aclaración
+
+- No pretende ser un motor profesional tipo Stockfish ni ganar torneos; la idea es **jugar, aprender y mejorarla poco a poco**.
+- No aseguro su funcionalidad al 100%, estoy avanzando en esto de la programación e intento depender lo mínimo posible de la IA por lo que iré revisando y adaptando el codigo poco a poco a medida que vayan surgiendo problemas.
+
 ## ✨ ¿Qué hace?
 
-* Devuelve un movimiento “decente” según unas heurísticas propias.
-* Incluye un modo de movimiento aleatorio para el “caos controlado”.
+* Devuelve un movimiento “decente” según mi propia forma de pensar.
+* Incluye un modo de movimiento aleatorio.
 * Usa `chess.js` para gestionar el tablero y validar jugadas.
 
 ---

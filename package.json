@@ -1,6 +1,6 @@
 {
   "name": "cortins-chess-ai",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Motor de ajedrez IA con el algoritmo Cortins Chess para calcular movimientos estratégicos",
   "type": "module",
   "main": "./dist/index.js",

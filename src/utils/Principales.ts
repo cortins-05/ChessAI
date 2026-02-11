@@ -78,7 +78,7 @@ export function primerasJugadasPosibles(params: {
       }
 
       // Elegimos el siguiente movimiento aleatorio desde la posición actual
-      const movesNow = ChessCopy.moves();
+      const movesNow = ChessCopy.moves({verbose:true});
       if (movesNow.length === 0) break;
       moveCopy = movesNow[Math.floor(Math.random() * movesNow.length)];
     }

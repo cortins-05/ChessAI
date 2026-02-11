@@ -1,5 +1,7 @@
 # ♟️ Cortins Chess AI (v1) — “mi motorcito de ajedrez” 😄
 
+📜 [Changelog](./CHANGELOG.md)](./CHANGELOG.md)
+
 ¡Bienvenido/a! Esto es **Cortins Chess AI**, una mini-IA de ajedrez hecha por mí como **entretenimiento** y experimento personal.
 
 No pretende ser un motor profesional tipo Stockfish ni ganar torneos; la idea es **jugar, aprender y mejorarla poco a poco**.

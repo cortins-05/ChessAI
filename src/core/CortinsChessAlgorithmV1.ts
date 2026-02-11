@@ -78,7 +78,7 @@ export class CortinsChessAlgorithmV1 {
     const defensasPulidas:Movimientos[] = [];
     if(defensas){
       console.log("Defensas:",defensas);
-      const defensas_mod = defensas.filter((a)=>FiltradoDefensaPrincipal(a)).sort((a,b)=>ordenarPorCalidadPieza(a.Pieza.type,b.Pieza.type));
+      const defensas_mod = defensas.filter((a)=>FiltradoDefensaPrincipal(a,chess,this.colorRival)).sort((a,b)=>ordenarPorCalidadPieza(a.Pieza.type,b.Pieza.type));
       console.log("Defensas Ordenadas Por Calidad De Pieza:",defensas);
       for(const defensa of defensas_mod){
         // Filtrar tanto por defensa secundaria como por riesgo (evitar perder la reina)
@@ -104,7 +104,7 @@ export class CortinsChessAlgorithmV1 {
     const ataques = ataque(chess,this.colorRival,this.colorPropio);
     const ataquesPulidos:Movimientos[] = [];
     if(ataques){
-      const ataques_mod = ataques.filter((a)=>FiltradoDefensaPrincipal(a)).sort((a,b)=>ordenarPorCalidadPieza(a.Pieza.type,b.Pieza.type));
+      const ataques_mod = ataques.filter((a)=>FiltradoDefensaPrincipal(a,chess,this.colorRival)).sort((a,b)=>ordenarPorCalidadPieza(a.Pieza.type,b.Pieza.type));
       for(const ataque of ataques_mod){
         const movimientosPulidos = ataque.MovimientosPosibles.filter((a)=>FiltradoRiesgo(chess.fen(),a,ataque.Pieza.type));
         if(movimientosPulidos.length>0) ataquesPulidos.push({

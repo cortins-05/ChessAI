@@ -19,9 +19,13 @@ export class CortinsChessAlgorithmV1 {
     this.colorPropio = colorRival==="b" ? "w" : "b";
   }
   
-  public randomMove(chess:Chess){
-    const moves = chess.moves();
-    return moves[Math.floor(Math.random() * moves.length)];
+  public randomMove(chess: Chess): string {
+    const moves = chess.moves({ verbose: true });
+
+    if (moves.length === 0) return null;
+
+    const move = moves[Math.floor(Math.random() * moves.length)];
+    return move.san;
   }
 
   //Este es el jefe de cocina del algoritmo, se encarga de que lleve un razonamiento estructurado y por partes
@@ -37,17 +41,16 @@ export class CortinsChessAlgorithmV1 {
     if (this.jugadaJaque && this.jugadaJaque.Jugada.length > 0) {
 
       const next = this.jugadaJaque.Jugada[0];
-      const piezaFrom = getPieceFrom(next, chess.fen());
       const esUltimoMovimientoMate = this.jugadaJaque.Tipo === "mate" && this.jugadaJaque.Jugada.length === 1;
 
       // Si es el ultimo movimiento de mate, ejecutar sin verificar riesgo (ganamos igual)
       // En cualquier otro caso, verificar FiltradoRiesgo
-      const esSeguro = esUltimoMovimientoMate || (piezaFrom && FiltradoRiesgo(chess.fen(), next, piezaFrom));
+      const esSeguro = esUltimoMovimientoMate || (next.from && FiltradoRiesgo(chess.fen(), next.to, next.piece));
 
-      if (next && movimientoValido(chess.fen(), next) && esSeguro) {
+      if (next && movimientoValido(chess.fen(), next.to) && esSeguro) {
         const shifted = this.jugadaJaque.Jugada.shift();
         console.log("Siguiendo la siguiente jugada jaque:", shifted, this.jugadaJaque);
-        if (shifted) return shifted;
+        if (shifted) return shifted.to;
       } else {
         this.jugadaJaque = undefined;
       }
@@ -60,14 +63,13 @@ export class CortinsChessAlgorithmV1 {
       if(jaqueMate.length>0){
         const jaqueMateDecidido = jaqueMate.sort((a,b)=>a.Jugada.length-b.Jugada.length)[0];
         const movimiento = jaqueMateDecidido.Jugada[0];
-        const piezaJaque = getPieceFrom(movimiento, chess.fen());
         console.log("Jaque mate establecido, recemos...", jaqueMateDecidido);
         // Solo seguir la linea de mate si el primer movimiento no sacrifica la reina
-        if(movimiento && movimientoValido(chess.fen(),movimiento) && piezaJaque && FiltradoRiesgo(chess.fen(), movimiento, piezaJaque)){
+        if(movimiento && movimientoValido(chess.fen(),movimiento.to) && FiltradoRiesgo(chess.fen(), movimiento.from, movimiento.piece)){
           this.jugadaJaque = jaqueMateDecidido;
           jaqueMateDecidido.Jugada.shift();
           console.log("Movimiento jaque:", movimiento);
-          return movimiento;
+          return movimiento.to;
         }
       }
     }
@@ -149,9 +151,8 @@ export class CortinsChessAlgorithmV1 {
     if(!move&&this.jugadasCalculadas&&this.jugadasCalculadas.length>0){
       const jugada_optima = this.jugadasCalculadas.sort((a,b)=>a.Jugada.length-b.Jugada.length);
       const movimientoOptimo = jugada_optima[0].Jugada[0];
-      const piezaOptima = getPieceFrom(movimientoOptimo, chess.fen());
       // Solo usar si no sacrifica la reina
-      if(movimientoOptimo && movimientoValido(chess.fen(), movimientoOptimo) && piezaOptima && FiltradoRiesgo(chess.fen(), movimientoOptimo, piezaOptima)){
+      if(movimientoOptimo && movimientoValido(chess.fen(), movimientoOptimo.to) && FiltradoRiesgo(chess.fen(), movimientoOptimo.from, movimientoOptimo.piece)){
         move = movimientoOptimo;
       }
     }

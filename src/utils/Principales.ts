@@ -1,7 +1,6 @@
-import { Chess, Color, Piece, Square } from "chess.js";
+import { Chess, Color, Move, Piece, Square } from "chess.js";
 import { Jugada, Movimientos, PIECE_VALUE } from '../types/types';
 import { ordenarPorCalidadPieza } from "./Ordenamiento";
-import { getPiece } from "./translators";
 
 /**
  * Busca las primeras N líneas (secuencias de jugadas) que TERMINEN en jaque mate
@@ -24,7 +23,11 @@ export function primerasJugadasPosibles(params: {
   } = params;
 
   const chess = new Chess(fenInicial);
-  const movimientosTablero = chess.moves().sort((a,b)=>ordenarPorCalidadPieza(getPiece(a,chess.fen())!,getPiece(b,chess.fen())!));
+  const movimientosTablero = chess
+  .moves({ verbose: true })
+  .sort((a, b) =>
+    ordenarPorCalidadPieza(a.piece, b.piece)
+  );
 
   const lista_movimientos: Jugada[] = [];
 
@@ -34,9 +37,10 @@ export function primerasJugadasPosibles(params: {
     if (lista_movimientos.length >= maxResults) break;
 
     const ChessCopy = new Chess(fenInicial);
+    
     let moveCopy = move;
 
-    const lista_movimientos_secundaria: string[] = [];
+    const lista_movimientos_secundaria: Move[] = [];
 
     for (let i = 0; i < maxInteracciones; i++) {
       if (lista_movimientos.length >= maxResults) break;

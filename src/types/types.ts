@@ -1,4 +1,4 @@
-import { Piece, PieceSymbol, Square } from "chess.js";
+import { Move, Piece, PieceSymbol, Square } from "chess.js";
 
 /**
  * Calcula el mejor movimiento para la posición actual
@@ -32,5 +32,5 @@ export type AtaqueDefensorio = {
 
 export interface Jugada {
   Tipo: "jaque" | "mate";
-  Jugada: string[];
+  Jugada: Move[];
 }

@@ -46,7 +46,7 @@ export class CortinsChessAlgorithmV1 {
 
       if (next && movimientoValido(chess.fen(), next) && esSeguro) {
         const shifted = this.jugadaJaque.Jugada.shift();
-        console.log("Siguiento la siguiente jugada jaque:", shifted, this.jugadaJaque);
+        console.log("Siguiendo la siguiente jugada jaque:", shifted, this.jugadaJaque);
         if (shifted) return shifted;
       } else {
         this.jugadaJaque = undefined;
@@ -125,7 +125,7 @@ export class CortinsChessAlgorithmV1 {
     }
 
     //5º Comprobar cuantos movimientos de ataques y defensas coinciden y se elige el mejor.
-    if(ataquesPulidos.length>0&&defensasPulidas){
+    if(ataquesPulidos.length>0&&defensasPulidas.length>0){
       const ataquesDefensorios:AtaqueDefensorio[] = [];
       for(const defensa of defensasPulidas){
         for(const ataque of ataquesPulidos){

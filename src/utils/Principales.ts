@@ -215,16 +215,20 @@ function piezasExpuestas(chess:Chess, colorRival:Color, colorPropio:Color, san:s
   const defensaAntes = analisisSimple(chess,colorRival,colorPropio);
 
   const chessCopy = new Chess(chess.fen());
-  chessCopy.move(san);
-  const defensaDepues = analisisSimple(chessCopy,colorRival,colorPropio);
+  try {
+    const moveResult = chessCopy.move(san);
+    if (!moveResult) return [];
+  } catch {
+    return [];
+  }
+  const defensaDespues = analisisSimple(chessCopy,colorRival,colorPropio);
 
-  if(defensaAntes&&defensaDepues){
-    const resultado = [];
-    for(const defensaD of defensaDepues){
-      for(const defensaA of defensaAntes){
-        if(defensaD.Pieza!=defensaA.Pieza){
-          resultado.push(defensaD.Pieza);
-        }
+  if(defensaAntes&&defensaDespues){
+    const resultado: Piece[] = [];
+    for(const defensaD of defensaDespues){
+      const yaEstaba = defensaAntes.some(defensaA => defensaA.Square === defensaD.Square);
+      if(!yaEstaba){
+        resultado.push(defensaD.Pieza);
       }
     }
     return resultado;
@@ -239,13 +243,17 @@ function piezasExpuestas(chess:Chess, colorRival:Color, colorPropio:Color, san:s
 export function quedaAtacadaTrasMover(fen: string, san: string): boolean {
   const chess = new Chess(fen);
 
-  const result = chess.move(san);     // si es SAN válido, devuelve objeto
-  if (!result) return false;          // movimiento ilegal => decide tú (yo devuelvo false)
+  try {
+    const result = chess.move(san);     // si es SAN válido, devuelve objeto
+    if (!result) return false;          // movimiento ilegal => decide tú (yo devuelvo false)
 
-  const square = result.to as Square; // casilla real destino
-  const atacante = chess.turn() as Color; // tras mover, le toca al rival: es quien ataca
+    const square = result.to as Square; // casilla real destino
+    const atacante = chess.turn() as Color; // tras mover, le toca al rival: es quien ataca
 
-  return chess.isAttacked(square, atacante);
+    return chess.isAttacked(square, atacante);
+  } catch {
+    return false;
+  }
 }
 
 export function movimientoValido(fen:string,san:string):boolean{

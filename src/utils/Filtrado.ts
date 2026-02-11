@@ -85,8 +85,12 @@ export function FiltradoDefensaSecundario(
     const colorPropio: Color = colorRival === "b" ? "w" : "b";
     const chess = new Chess(fen);
     
-    const result = chess.move(movimiento);
-    if (!result) return false; // Movimiento inválido
+    try {
+        const result = chess.move(movimiento);
+        if (!result) return false; // Movimiento inválido
+    } catch {
+        return false;
+    }
     
     const defensaNueva = defensa(chess, colorRival, colorPropio);
     

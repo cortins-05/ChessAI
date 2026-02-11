@@ -6,7 +6,7 @@
 
 📌 [**Repo**](https://github.com/cortins-05/ChessAI)
 
-📜 [Changelog
+📜 [**Changelog**](./CHANGELOG.md)
 
 ---
 

@@ -30,9 +30,3 @@ export {
   FiltradoDefensaPrincipal,
   FiltradoDefensaSecundario,
 } from './utils/Filtrado';
-
-export {
-  changeToSquare,
-  getPiece,
-  getPieceFrom,
-} from './utils/translators';

@@ -1,23 +1,23 @@
-import { Chess, Color, PieceSymbol, Square } from "chess.js";
+import { Chess, Color, PieceSymbol, Square, Move } from 'chess.js';
 import { quedaAtacadaTrasMover, defensa } from './Principales';
 import { Movimientos, PIECE_VALUE } from "../types/types";
-import { getPiece } from "./translators";
 
 /**
  * La función retorna true si se cumple alguna de estas condiciones:
  *  Hay captura Y la pieza capturada (piezaTo) vale más que la pieza que se mueve (piezaFrom)
  *  La pieza NO queda atacada tras realizar el movimiento
  */  
-export function FiltradoRiesgo(fen:string,movimiento:string,piezaFrom:PieceSymbol){
-    const piezaTo = getPiece(movimiento,fen);
+export function FiltradoRiesgo(fen:string,movimiento:Move){
+    const chess = new Chess(fen);
+    const piezaTo = chess.get(movimiento.to);
 
     //No perdemos la reina ni de coña.
-    if(piezaFrom=="q"&&quedaAtacadaTrasMover(fen,movimiento)){
+    if(movimiento.piece=="q"&&quedaAtacadaTrasMover(fen,movimiento.from)){
         return false;
     }
-    if((piezaTo&&PIECE_VALUE[piezaFrom]<PIECE_VALUE[piezaTo])||(!quedaAtacadaTrasMover(fen,movimiento))){
-        console.log("Pieza From:",piezaFrom);
-        console.log("Pieza To:",piezaTo);
+    if((piezaTo&&PIECE_VALUE[movimiento.piece]<PIECE_VALUE[piezaTo.type])||(!quedaAtacadaTrasMover(fen,movimiento.san))){
+        console.log("Pieza From:",movimiento.to);
+        console.log("Pieza To:",piezaTo?.type);
         return true;
     }
     return false;
@@ -40,9 +40,9 @@ export function FiltradoDefensaPrincipal(
     if(defensa.Pieza.type === "k"){
         const movimientosFiltrados = defensa.MovimientosPosibles.filter(mov => {
             // Detectar si es una captura (contiene 'x')
-            if(mov.includes("x")){
+            if(mov.captured!=undefined){
                 // Extraer casilla destino del movimiento (ej: "Kxe5" -> "e5")
-                const match = mov.match(/x([a-h][1-8])/);
+                const match = mov.to;
                 if(match){
                     const casillaDestino = match[1] as Square;
                     // Si la casilla está defendida por el rival, el rey no puede capturar

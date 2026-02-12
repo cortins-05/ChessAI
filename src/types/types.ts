@@ -20,7 +20,7 @@ export const PIECE_VALUE: Record<PieceSymbol, number> = {
 export interface Movimientos {
   Pieza:Piece;
   Square:Square;
-  MovimientosPosibles: string[];
+  MovimientosPosibles: Move[];
   PiezasExpuestas:Piece[];
   CalidadPieza?: number;
 }

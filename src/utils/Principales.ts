@@ -115,7 +115,7 @@ export function defensa(chess: Chess,colorRival:Color,colorPropio:Color):Movimie
               if (moves.length > 0) movimientos.push({
                 Pieza:pieza,
                 Square:square,
-                MovimientosPosibles: sans,
+                MovimientosPosibles: moves,
                 PiezasExpuestas: expuestas,
                 CalidadPieza: PIECE_VALUE[pieza.type]
               });
@@ -156,7 +156,7 @@ export function ataque(chess:Chess, colorRival:Color, colorPropio:Color):Movimie
           movimientos.push({
             Pieza: pieza,
             Square: square,
-            MovimientosPosibles: capturas,
+            MovimientosPosibles: moves,
             PiezasExpuestas: expuestas,
             CalidadPieza: PIECE_VALUE[pieza.type]
           });
@@ -167,7 +167,7 @@ export function ataque(chess:Chess, colorRival:Color, colorPropio:Color):Movimie
   if (movimientos.length > 0) {
       return movimientos
       .filter(movimiento =>
-        movimiento.MovimientosPosibles.some(mov => mov.includes("x"))
+        movimiento.MovimientosPosibles.some(mov => mov.captured!=undefined)
       )
       .sort((a, b) =>
         ordenarPorCalidadPieza(a.Pieza.type, b.Pieza.type)
@@ -201,7 +201,7 @@ function piezasExpuestas(chess:Chess, colorRival:Color, colorPropio:Color, san:s
               movimientos.push({
                 Pieza:pieza,
                 Square:square,
-                MovimientosPosibles:sans,
+                MovimientosPosibles:moves,
                 PiezasExpuestas: [],
                 CalidadPieza: PIECE_VALUE[pieza.type]
               });
@@ -258,6 +258,17 @@ export function quedaAtacadaTrasMover(fen: string, san: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function evitaTablasSiVasGanando(chess: Chess, candidatoSan: string): boolean {
+  const copy = new Chess(chess.fen());
+  copy.move(candidatoSan);
+
+  // Si el movimiento provoca repetición / draw, lo evitamos
+  if (copy.isThreefoldRepetition()) return false;
+  if (copy.isDraw()) return false; // incluye 50-move, insuficiente, etc.
+
+  return true;
 }
 
 export function movimientoValido(fen:string,san:string):boolean{

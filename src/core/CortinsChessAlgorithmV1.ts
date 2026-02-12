@@ -1,5 +1,5 @@
 import { Chess, Color, Move } from 'chess.js';
-import { ataque, quedaAtacadaTrasMover, defensa, movimientoValido, primerasJugadasPosibles, evitaTablasSiVasGanando } from '../utils/Principales';
+import { ataque, quedaAtacadaTrasMover, defensa, movimientoValido, primerasJugadasPosibles } from '../utils/Principales';
 import { ordenarPorCalidadPieza } from "../utils/Ordenamiento";
 import { AtaqueDefensorio, Jugada, Movimientos } from "../types/types";
 import { FiltradoDefensaPrincipal, FiltradoDefensaSecundario, FiltradoRiesgo } from "../utils/Filtrado";
@@ -97,8 +97,7 @@ export class CortinsChessAlgorithmV1 {
       }
       if(defensasPulidas.length>0){
         const candidatos = defensasPulidas[0].MovimientosPosibles.map(m => m.san);
-        const elegido = candidatos.find(san => evitaTablasSiVasGanando(chess, san));
-        move = elegido ?? candidatos[0];
+        move = candidatos[0];
         console.log("Movimiento defensorio seguro: ",move);
       }
     }
@@ -120,9 +119,7 @@ export class CortinsChessAlgorithmV1 {
       }
       if (ataquesPulidos.length > 0) {
         const candidatos = ataquesPulidos[0].MovimientosPosibles.map(m => m.san);
-
-        const elegido = candidatos.find(san => evitaTablasSiVasGanando(chess, san));
-        move = elegido ?? candidatos[0];
+        move = candidatos[0];
 
         console.log("Movimiento de ataque:", move);
       }
@@ -155,9 +152,8 @@ export class CortinsChessAlgorithmV1 {
 
         const candidatos = ataquesDefensorios.filter(x => x.movimiento.captured!=undefined);
         const base = candidatos.length > 0 ? candidatos : ataquesDefensorios;
-        const elegido = base.find(move => evitaTablasSiVasGanando(chess, move.movimiento.san))?.movimiento.san;
 
-        move = elegido ?? base[0].movimiento.san;
+        move = base[0].movimiento.san;
         console.log("Movimiento comparativo ataque+defensa:", move);
       }
     }

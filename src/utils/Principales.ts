@@ -258,17 +258,6 @@ export function quedaAtacadaTrasMover(fen: string, san: string): boolean {
   }
 }
 
-export function evitaTablasSiVasGanando(chess: Chess, candidatoSan: string): boolean {
-  const copy = new Chess(chess.fen());
-  copy.move(candidatoSan);
-
-  // Si el movimiento provoca repetición / draw, lo evitamos
-  if (copy.isThreefoldRepetition()) return false;
-  if (copy.isDraw()) return false; // incluye 50-move, insuficiente, etc.
-
-  return true;
-}
-
 export function movimientoValido(fen:string,san:string):boolean{
   const chess = new Chess(fen);
   try{

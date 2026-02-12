@@ -4,7 +4,6 @@ export { CortinsChessAlgorithmV1 } from './core/CortinsChessAlgorithmV1';
 // Types - Tipos e interfaces
 export {
   type DifficultyLevel,
-  type PlayerColor,
   type Movimientos,
   type AtaqueDefensorio,
   type Jugada,

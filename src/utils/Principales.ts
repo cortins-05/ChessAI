@@ -146,13 +146,11 @@ export function ataque(chess:Chess, colorRival:Color, colorPropio:Color):Movimie
 
         if (chess.turn() !== colorPropio) continue;
         const moves = chess.moves({ square, verbose: true });
-        const capturas = moves
-          .filter(m => m.flags.includes("c") || m.flags.includes("e"))
-          .map(m => m.san);
+        const capturas = moves.filter(m=>m.captured!=undefined);
 
         if (capturas.length > 0) {
           // Calcular piezas expuestas para el primer movimiento de captura
-          const expuestas = piezasExpuestas(chess,colorRival,colorPropio, capturas[0]);
+          const expuestas = piezasExpuestas(chess,colorRival,colorPropio, capturas[0].san);
           movimientos.push({
             Pieza: pieza,
             Square: square,

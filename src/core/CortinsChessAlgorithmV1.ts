@@ -154,9 +154,10 @@ export class CortinsChessAlgorithmV1 {
         ataquesDefensorios.sort((a, b) => b.CalidadPieza - a.CalidadPieza);
 
         const candidatos = ataquesDefensorios.filter(x => x.movimiento.captured!=undefined);
-        const elegido = candidatos.find(move => evitaTablasSiVasGanando(chess, move.movimiento.san))?.movimiento.san;
+        const base = candidatos.length > 0 ? candidatos : ataquesDefensorios;
+        const elegido = base.find(move => evitaTablasSiVasGanando(chess, move.movimiento.san))?.movimiento.san;
 
-        move = elegido ?? candidatos[0].movimiento.san;
+        move = elegido ?? base[0].movimiento.san;
         console.log("Movimiento comparativo ataque+defensa:", move);
       }
     }

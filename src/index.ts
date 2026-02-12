@@ -1,5 +1,5 @@
 // Core - Algoritmo principal
-export { CortinsChessAlgorithmV1 } from './core/CortinsChessAlgorithmV1';
+export { CortinsChessAlgorithmV1 } from './v1/core/CortinsChessAlgorithmV1';
 
 // Types - Tipos e interfaces
 export {
@@ -8,7 +8,7 @@ export {
   type AtaqueDefensorio,
   type Jugada,
   PIECE_VALUE,
-} from './types/types';
+} from './v1/types/types';
 
 // Utils - Funciones auxiliares
 export {
@@ -17,15 +17,15 @@ export {
   ataque,
   quedaAtacadaTrasMover,
   movimientoValido,
-} from './utils/Principales';
+} from './v1/utils/Principales';
 
 export {
   ordenarPorCalidadPieza,
   ordenPorRiesgo,
-} from './utils/Ordenamiento';
+} from './v1/utils/Ordenamiento';
 
 export {
   FiltradoRiesgo,
   FiltradoDefensaPrincipal,
   FiltradoDefensaSecundario,
-} from './utils/Filtrado';
+} from './v1/utils/Filtrado';

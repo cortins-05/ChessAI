@@ -142,7 +142,7 @@ export class CortinsChessAlgorithmV1 {
           for (const mov of ataque.MovimientosPosibles) {
             if (setDef.has(mov.san)) {
               ataquesDefensorios.push({
-                movimiento: mov.san,
+                movimiento: mov,
                 CalidadPieza: defensa.CalidadPieza ?? 0,
               });
             }
@@ -153,10 +153,10 @@ export class CortinsChessAlgorithmV1 {
       if (ataquesDefensorios.length > 0) {
         ataquesDefensorios.sort((a, b) => b.CalidadPieza - a.CalidadPieza);
 
-        const candidatos = ataquesDefensorios.map(x => x.movimiento);
-        const elegido = candidatos.find(san => evitaTablasSiVasGanando(chess, san));
+        const candidatos = ataquesDefensorios.filter(x => x.movimiento.captured!=undefined);
+        const elegido = candidatos.find(move => evitaTablasSiVasGanando(chess, move.movimiento.san))?.movimiento.san;
 
-        move = elegido ?? candidatos[0];
+        move = elegido ?? candidatos[0].movimiento.san;
         console.log("Movimiento comparativo ataque+defensa:", move);
       }
     }

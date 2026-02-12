@@ -26,7 +26,7 @@ export interface Movimientos {
 }
 
 export type AtaqueDefensorio = {
-  movimiento: string;
+  movimiento: Move;
   CalidadPieza: number;
 };
 

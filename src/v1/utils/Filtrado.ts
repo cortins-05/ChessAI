@@ -16,8 +16,6 @@ export function FiltradoRiesgo(fen:string,movimiento:Move){
         return false;
     }
     if((piezaTo&&PIECE_VALUE[movimiento.piece]<PIECE_VALUE[piezaTo.type])||(!quedaAtacadaTrasMover(fen,movimiento.san))){
-        console.log("Pieza From:",movimiento.to);
-        console.log("Pieza To:",piezaTo?.type);
         return true;
     }
     return false;

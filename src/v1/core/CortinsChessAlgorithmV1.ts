@@ -33,7 +33,6 @@ export class CortinsChessAlgorithmV1 {
     let move:string|undefined=undefined;
 
     const historial = chess.history();
-    console.log("Historial:",historial);
 
     //1º: Comprobamos si hay jugada de jaque y que sea valida; en función de que esté a huevo y de que si no lo está que no haya riesgo.
     // Si no, reestablecemos la jugada de jaque.
@@ -48,7 +47,6 @@ export class CortinsChessAlgorithmV1 {
 
       if (next && movimientoValido(chess.fen(), next.san) && esSeguro) {
         const shifted = this.jugadaJaque.Jugada.shift();
-        console.log("Siguiendo la siguiente jugada jaque:", shifted, this.jugadaJaque);
         if (shifted) return shifted.san;
       } else {
         this.jugadaJaque = undefined;
@@ -62,12 +60,10 @@ export class CortinsChessAlgorithmV1 {
       if(jaqueMate.length>0){
         const jaqueMateDecidido = jaqueMate.sort((a,b)=>a.Jugada.length-b.Jugada.length)[0];
         const movimiento = jaqueMateDecidido.Jugada[0];
-        console.log("Jaque mate establecido, recemos...", jaqueMateDecidido);
         // Solo seguir la linea de mate si el primer movimiento no sacrifica la reina
         if(movimiento && movimientoValido(chess.fen(),movimiento.san) && FiltradoRiesgo(chess.fen(), movimiento)){
           this.jugadaJaque = jaqueMateDecidido;
           jaqueMateDecidido.Jugada.shift();
-          console.log("Movimiento jaque:", movimiento);
           return movimiento.san;
         }
       }
@@ -78,9 +74,7 @@ export class CortinsChessAlgorithmV1 {
     const defensas = defensa(chess,this.colorRival,this.colorPropio);
     const defensasPulidas:Movimientos[] = [];
     if(defensas){
-      console.log("Defensas:",defensas);
       const defensas_mod = defensas.filter((a)=>FiltradoDefensaPrincipal(a,chess,this.colorRival)).sort((a,b)=>ordenarPorCalidadPieza(a.Pieza.type,b.Pieza.type));
-      console.log("Defensas Ordenadas Por Calidad De Pieza:",defensas);
       for(const defensa of defensas_mod){
         // Filtrar tanto por defensa secundaria como por riesgo (evitar perder la reina)
         const movimientosPulidos = defensa.MovimientosPosibles.filter((a)=>
@@ -98,7 +92,6 @@ export class CortinsChessAlgorithmV1 {
       if(defensasPulidas.length>0){
         const candidatos = defensasPulidas[0].MovimientosPosibles.map(m => m.san);
         move = candidatos[0];
-        console.log("Movimiento defensorio seguro: ",move);
       }
     }
 
@@ -120,12 +113,7 @@ export class CortinsChessAlgorithmV1 {
       if (ataquesPulidos.length > 0) {
         const candidatos = ataquesPulidos[0].MovimientosPosibles.map(m => m.san);
         move = candidatos[0];
-
-        console.log("Movimiento de ataque:", move);
       }
-      console.log("Ataques ordenados por calidad de pieza:",ataques);
-      console.log("Ataques ordenados por calidad de pieza mod:",ataques_mod);
-      console.log("Ataques pulidos:",ataquesPulidos);
     }
 
     //5º Comprobar cuantos movimientos de ataques y defensas coinciden y se elige el mejor.
@@ -154,7 +142,6 @@ export class CortinsChessAlgorithmV1 {
         const base = candidatos.length > 0 ? candidatos : ataquesDefensorios;
 
         move = base[0].movimiento.san;
-        console.log("Movimiento comparativo ataque+defensa:", move);
       }
     }
     
@@ -169,7 +156,6 @@ export class CortinsChessAlgorithmV1 {
 
     //Si no encontro nada, fomentamos el avance seguro de los peones.
     if(!move){
-      console.log("Entramos en movimiento aleatorio...");
       const moves = chess.moves({verbose:true}).filter((a)=>!quedaAtacadaTrasMover(chess.fen(),a.san));
       move = moves.sort((a,b)=>ordenarPorCalidadPieza(a.piece,b.piece)).reverse()[0].san;
     }

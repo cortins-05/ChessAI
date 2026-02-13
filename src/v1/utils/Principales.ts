@@ -105,7 +105,6 @@ export function defensa(chess: Chess,colorRival:Color,colorPropio:Color):Movimie
           if (chess.isAttacked(square, colorRival)) {
               const moves = chess.moves({ square, verbose: true });
               const sans = moves.map(m => m.san);
-              console.log("Sans:",sans);
               let expuestas:Piece[];
               if(sans.length>0){
                 expuestas = piezasExpuestas(chess,colorRival,colorPropio, sans[0]);

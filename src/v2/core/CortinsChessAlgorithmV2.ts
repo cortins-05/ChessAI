@@ -38,7 +38,11 @@ export class CortinsChessAlgorithmV2 {
 
         let move:RetornaDesarrollo|undefined;
         let moves = chess.moves({verbose:true});
-        const movimientos_no_repititivos = moves = moves.filter(mov=>mov.san!=this.ultimosUci.at(-1)&&mov.san!=this.ultimosUci.at(-2));
+
+        const lastUci = this.ultimosUci[this.ultimosUci.length - 1];
+        const prevUci = this.ultimosUci[this.ultimosUci.length - 2];
+
+        const movimientos_no_repititivos = moves = moves.filter(mov=>mov.san!=lastUci&&mov.san!=prevUci);
         const longitudInicial = moves.length;
 
         const pos = chess.findPiece({ color: this.colorRival, type: "k" }) as Square[];
@@ -48,7 +52,7 @@ export class CortinsChessAlgorithmV2 {
         const defensasPosibles = defensaV2(movimientos_no_repititivos);
 
         moves = filterKingNotAdjacentToEnemyKing(moves, enemyKingSq);
-        const probabilidadJaque = longitudInicial-moves.length;
+        const probabilidadJaque = longitudInicial - moves.length;
 
         //2-> Analizamos si hay ataques disponibles y guardamos en variable con interfaz Ataque
         const ataquesPosibles = ataqueV2(moves);
@@ -60,7 +64,7 @@ export class CortinsChessAlgorithmV2 {
         console.log(probabilidadJaque);
 
         if(probabilidadJaque>=3){
-            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:5,slice:4});
+            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:4,slice:3});
         }
 
         if (this.jugadasJaqueMate && this.jugadasJaqueMate.length > 0) {
@@ -74,7 +78,7 @@ export class CortinsChessAlgorithmV2 {
                 this.jugadasJaqueMate = [];
             } else {
                 let linea = candidatas[0];
-                if(this.ultimosUci&&this.ultimosUci.length>1&&linea[0].san==this.ultimosUci.at(-1)&&linea[0].san==this.ultimosUci.at(-2)){
+                if(this.ultimosUci&&this.ultimosUci.length>1&&linea[0].san==lastUci&&linea[0].san==prevUci){
                     console.log("JUGADA DE JAQUE REPETITIVA, SALTANDO...");
                 }
                 else if(linea.length>1){
@@ -96,7 +100,7 @@ export class CortinsChessAlgorithmV2 {
         }
         
         if(this.jugadasJaqueMate.length==0&&ContarPiezasTotales(chess.fen())<20){
-            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:4,slice:3});
+            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:3,slice:2});
         }
 
         const rey:Piece = {
@@ -126,7 +130,7 @@ export class CortinsChessAlgorithmV2 {
 
         if(defensasPosibles.ImplicanAtaqueSinRiesgo.length>0){
             const movimiento = defensasPosibles.ImplicanAtaqueSinRiesgo;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==this.ultimosUci.at(-1)&&movimiento.length>1){
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
                 move = {
                     san: movimiento[1].san,
                     code: "ATAQUE DEFENSIVO SIN RIESGO"
@@ -140,7 +144,7 @@ export class CortinsChessAlgorithmV2 {
             
         }else if(defensasPosibles.PorRiesgoOrdenadas.length>0){
             const movimiento = defensasPosibles.PorRiesgoOrdenadas;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==this.ultimosUci.at(-1)&&movimiento.length>1){
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
                 move = {
                     san: movimiento[1].san,
                     code: "DEFENSAS POR RIESGO ORDENADAS"
@@ -154,7 +158,7 @@ export class CortinsChessAlgorithmV2 {
             
         }else if(defensasPosibles.BrutasOrdenadas.length>0){
             const movimiento = defensasPosibles.BrutasOrdenadas;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==this.ultimosUci.at(-1)&&movimiento.length>1){
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
                 move = {
                     san: movimiento[1].san,
                     code: "DEFENSAS BRUTAS ORDENADAS"
@@ -172,7 +176,7 @@ export class CortinsChessAlgorithmV2 {
             }
         }else if(ataquesPosibles.PorRiesgoOrdenados.length>0){
             const movimiento = ataquesPosibles.PorRiesgoOrdenados;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==this.ultimosUci.at(-1)&&movimiento.length>1){
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
                 move = {
                     san: movimiento[1].san,
                     code: "ATAQUES POR RIESGO ORDENADOS"

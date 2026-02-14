@@ -9,7 +9,6 @@ import { FiltradoDefensaV2 } from '../engine/filter/Defensa';
 import { filterKingNotAdjacentToEnemyKing } from '../utils/KingSquares';
 import { PIECE_VALUE, RetornaDesarrollo } from '../types/types';
 import ordenPorRiesgo from '../engine/order/Riesgo';
-import PredecirJaqueRival from '../engine/analisys/PredecirJaque';
 import MovimientoDefensivoContraJaque from '../engine/analisys/PredecirJaque';
 
 
@@ -111,9 +110,8 @@ export class CortinsChessAlgorithmV2 {
         }
 
         const posicion_rey = chess.findPiece(rey);
-        let piezas_inmoviles:Square[];
         const chessCopy = new Chess(chess.fen());
-        piezas_inmoviles = chessCopy.moves({square:posicion_rey[0],verbose:true}).map(mov => mov.to);
+        const piezas_inmoviles = chessCopy.moves({square:posicion_rey[0],verbose:true}).map(mov => mov.to);
 
         if (chess.inCheck()) {
             if (defensasPosibles.PorRiesgoOrdenadas.length > 0) {
@@ -130,7 +128,7 @@ export class CortinsChessAlgorithmV2 {
             };
         }
 
-        const movimientoContraJaque = MovimientoDefensivoContraJaque(chess,4,4);
+        const movimientoContraJaque = MovimientoDefensivoContraJaque(chess,3,3);
 
         if(movimientoContraJaque){
             return {

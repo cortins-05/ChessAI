@@ -1,6 +1,7 @@
 import { Move, Chess } from 'chess.js';
 import { PIECE_VALUE } from '../../types/types';
 import InvertirColor from '../../utils/ColorInverso';
+import { piezasAtacadasPor } from '../../utils/PiezasAtacadas';
 
 export function FiltradoDefensaV2(move: Move) {
   const chessAntes = new Chess(move.before);
@@ -9,9 +10,18 @@ export function FiltradoDefensaV2(move: Move) {
   const chessDespues = new Chess(move.after);
   const colorContrario = InvertirColor(move.color);
 
-  if (move.piece === "q" && chessDespues.isAttacked(move.to, colorContrario)) {
+  const piezasMiasAtacadasAntes = piezasAtacadasPor(chessAntes,colorContrario);
+  const piezasAtacadasDespues = piezasAtacadasPor(chessDespues,colorContrario);
+
+  const valorAntes = piezasMiasAtacadasAntes.reduce((a,p)=>a+PIECE_VALUE[p.PiezaSimbolo],0);
+  const valorDespues = piezasAtacadasDespues.reduce((a,p)=>a+PIECE_VALUE[p.PiezaSimbolo],0);
+  const mejora = valorAntes - valorDespues;
+
+  if (PIECE_VALUE[move.piece] >= 5 && chessDespues.isAttacked(move.to, colorContrario)) {
     return false;
   }
+
+  if (mejora <= 0) return false;
 
   if (
     (piezaTo && PIECE_VALUE[move.piece] < PIECE_VALUE[piezaTo.type]) ||

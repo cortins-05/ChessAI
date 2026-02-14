@@ -1,4 +1,4 @@
-import type { Square, Move } from "chess.js";
+import { type Square, type Move, type Color, Chess } from "chess.js";
 
 const FILES = "abcdefgh" as const;
 
@@ -7,7 +7,7 @@ function isOnBoard(file: number, rank: number) {
 }
 
 /** Devuelve las 8 casillas adyacentes a un rey en `kingSq` (pueden ser 3..8 si está en borde). */
-export function kingAdjacentSquares(kingSq: Square): Square[] {
+function kingAdjacentSquares(kingSq: Square): Square[] {
   const file = FILES.indexOf(kingSq[0] as any);
   const rank = Number(kingSq[1]);
 
@@ -19,6 +19,29 @@ export function kingAdjacentSquares(kingSq: Square): Square[] {
       const nr = rank + dr;
       if (!isOnBoard(nf, nr)) continue;
       out.push(`${FILES[nf]}${nr}` as Square);
+    }
+  }
+  return out;
+}
+
+/** Devuelve las 8 casillas adyacentes a un rey en `kingSq` QUE ESTAN ATACADAS(pueden ser 3..8 si está en borde). */
+export function kingAdjacentSquaresAttaqued(kingSq: Square,fen:string,colorRival:Color): Square[] {
+  const file = FILES.indexOf(kingSq[0] as any);
+  const rank = Number(kingSq[1]);
+  const chess = new Chess(fen);
+
+  const out: Square[] = [];
+  for (let df = -1; df <= 1; df++) {
+    for (let dr = -1; dr <= 1; dr++) {
+      if (df === 0 && dr === 0) continue;
+      const nf = file + df;
+      const nr = rank + dr;
+      if (!isOnBoard(nf, nr)) continue;
+      const square = `${FILES[nf]}${nr}` as Square;
+  
+      if(chess.isAttacked(square,colorRival)){
+        out.push(square);
+      }
     }
   }
   return out;

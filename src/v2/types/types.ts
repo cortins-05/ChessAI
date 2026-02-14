@@ -1,4 +1,4 @@
-import { PieceSymbol, Move } from 'chess.js';
+import { PieceSymbol, Move, Square } from 'chess.js';
 
 export const PIECE_VALUE: Record<PieceSymbol, number> = {
   p: 1,
@@ -20,4 +20,14 @@ export interface Defensas {
   PorRiesgoOrdenadas:Move[];
   ImplicanAtaqueConRiesgo:Move[];
   ImplicanAtaqueSinRiesgo:Move[];
+}
+
+export interface BoardDefensa {
+  PiezaSimbolo: PieceSymbol;
+  Square: Square;
+}
+
+export interface RetornaDesarrollo {
+  san: string;
+  code: string;
 }

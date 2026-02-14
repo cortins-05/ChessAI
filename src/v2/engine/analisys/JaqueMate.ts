@@ -1,6 +1,6 @@
 import { Chess, Move } from "chess.js";
 import isValidMove from "../../utils/ValidMove";
-import { FiltradoPorRiesgoV2 } from "../filter/Ataque";
+import { scoreKingCage } from "../../utils/FindKing";
 
 interface PropsJugadas {
   moves: Move[];
@@ -22,14 +22,35 @@ export default function JugadasJaqueMate({ moves, profundidad, slice }: PropsJug
         if (depthLeft === 0 || chess.isGameOver()) return;
         
         const all = chess.moves({ verbose: true });
-        const checks = all.filter(m => {
-        const c = new Chess(m.after);
-        return c.inCheck(); // el rival queda en jaque
-        });
-        const captures = all.filter(m => m.captured);
-        const rest = all.filter(m => !m.captured);
 
-        const siguientes = [...checks, ...captures, ...rest].slice(0, slice);
+        const attacker = chess.turn(); // el que va a mover AHORA
+
+        // Calculamos score por candidato (en la posición DESPUÉS del move)
+        const scored = all.map(m => {
+        const next = new Chess(m.after);
+        let s = scoreKingCage(next, m.after, attacker);
+
+        // extras opcionales
+        if (m.captured) s += 3;
+        if (next.inCheck()) s += 5; // deja al rival en jaque
+
+        return { m, s };
+        });
+
+        // Si quieres mantener tu prioridad checks>captures>rest,
+        // puedes conservar el “bucket” pero ordenar dentro por score:
+        const checks = scored.filter(x => new Chess(x.m.after).inCheck());
+        const captures = scored.filter(x => x.m.captured && !new Chess(x.m.after).inCheck());
+        const rest = scored.filter(x => !x.m.captured && !new Chess(x.m.after).inCheck());
+
+        checks.sort((a,b) => b.s - a.s);
+        captures.sort((a,b) => b.s - a.s);
+        rest.sort((a,b) => b.s - a.s);
+
+        const siguientes = [...checks, ...captures, ...rest]
+        .slice(0, slice)
+        .map(x => x.m);
+
 
         for (const m of siguientes) {
             const next = new Chess(m.after);

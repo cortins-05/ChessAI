@@ -13,9 +13,13 @@ export function FiltradoPorRiesgoV2(move: Move) {
   const destinoDefendidoPorRival = chessDespues.isAttacked(move.to, rival);
 
   // si es reina y queda defendida por rival => descarta
-  if (move.piece === "q" && destinoDefendidoPorRival) return false;
+  if (PIECE_VALUE[move.piece] >= 5 && destinoDefendidoPorRival) return false;
 
-  // “gana material” o “no está defendido”
+  if (destinoDefendidoPorRival) {
+    const gain = piezaEnDestinoAntes ? PIECE_VALUE[piezaEnDestinoAntes.type] - PIECE_VALUE[move.piece] : -999;
+    if (gain <= 0) return false;
+  }
+
   if (
     (piezaEnDestinoAntes && PIECE_VALUE[move.piece] < PIECE_VALUE[piezaEnDestinoAntes.type]) ||
     !destinoDefendidoPorRival

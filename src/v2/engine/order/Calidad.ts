@@ -7,3 +7,7 @@ import { PIECE_VALUE } from "../../types/types";
 export function ordenarPorCalidadPieza(a: Move, b: Move): number { 
   return PIECE_VALUE[b.piece] - PIECE_VALUE[a.piece];
 }
+
+export function ordenPorCalidadPiezaSimbolo(a:PieceSymbol,b:PieceSymbol):number{
+  return PIECE_VALUE[b] - PIECE_VALUE[a];
+}

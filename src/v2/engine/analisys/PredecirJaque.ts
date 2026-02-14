@@ -1,121 +1,82 @@
 import { Chess, Move } from "chess.js";
 import { scoreKingCage } from "../../utils/FindKing";
 
-type Threat = { move: Move | null; score: number; givesCheckSoon: boolean };
+type CheckReplyInfo = {
+  count: number;      // cuántos jaques tiene el rival como respuesta
+  worst: number;      // el jaque más peligroso (max score)
+  bestMove: Move | null; // el jaque más peligroso (por si quieres ver cuál era)
+};
 
-// Evalúa la mejor “amenaza de jaque” del bando que mueve en `pos` (normalmente el rival).
-function bestCheckThreat(pos: Chess, profundidad: number, slice: number): Threat {
-  if (pos.isGameOver()) return { move: null, score: -Infinity, givesCheckSoon: false };
+// Devuelve info sobre JAQUES INMEDIATOS del bando que mueve en `pos`.
+function immediateCheckReplies(pos: Chess, slice: number): CheckReplyInfo {
+  if (pos.isGameOver()) return { count: 0, worst: -Infinity, bestMove: null };
 
-  let best: Threat = { move: null, score: -Infinity, givesCheckSoon: false };
+  const attacker = pos.turn();
+  const all = pos.moves({ verbose: true });
 
-  function orderMoves(ch: Chess): { m: Move; s: number; isCheck: boolean }[] {
-    const attacker = ch.turn();
-    const all = ch.moves({ verbose: true });
-
-    const scored = all.map((m) => {
+  const checks = all
+    .map((m) => {
       const next = new Chess(m.after);
+
+      // Tras mover el rival, le toca a "tú". Si next.inCheck() => tu rey está en jaque.
+      const isCheck = next.inCheck();
+      if (!isCheck) return null;
+
       let s = scoreKingCage(next, m.after, attacker);
 
       if (m.captured) s += 3;
-      if (next.inCheck()) s += 8;      // jaque = muy relevante
       if (next.isCheckmate()) s += 50_000;
 
-      return { m, s, isCheck: next.inCheck() };
-    });
+      return { m, s };
+    })
+    .filter((x): x is { m: Move; s: number } => x !== null)
+    .sort((a, b) => b.s - a.s)
+    .slice(0, slice);
 
-    // checks > captures > resto, y dentro por score
-    const checks = scored.filter(x => x.isCheck).sort((a,b)=>b.s-a.s);
-    const captures = scored.filter(x => x.m.captured && !x.isCheck).sort((a,b)=>b.s-a.s);
-    const rest = scored.filter(x => !x.m.captured && !x.isCheck).sort((a,b)=>b.s-a.s);
+  if (checks.length === 0) return { count: 0, worst: -Infinity, bestMove: null };
 
-    return [...checks, ...captures, ...rest].slice(0, slice);
-  }
-
-  function dfs(ch: Chess, depthLeft: number, firstMove: Move | null) {
-    if (depthLeft === 0 || ch.isGameOver()) return;
-
-    const candidates = orderMoves(ch);
-
-    for (const c of candidates) {
-      const next = new Chess(c.m.after);
-      const fm = firstMove ?? c.m;
-
-      // “amenaza” = consigue jaque en algún punto de la línea
-      // (si es mate, ya va super-premiado arriba)
-      if (c.isCheck || next.isCheckmate()) {
-        const score = c.s + (1000 / (profundidad - depthLeft + 1)); // antes = más peligroso
-        if (score > best.score) {
-          best = { move: fm, score, givesCheckSoon: true };
-        }
-      }
-
-      dfs(next, depthLeft - 1, fm);
-    }
-  }
-
-  dfs(pos, profundidad, null);
-  return best;
+  return {
+    count: checks.length,
+    worst: checks[0].s,      // el más peligroso (ya están ordenados desc)
+    bestMove: checks[0].m,
+  };
 }
 
 /**
- * Devuelve el movimiento defensivo óptimo (tu jugada) si existe amenaza de jaque probable.
- * Si no hay amenaza relevante, devuelve null.
- *
- * IMPORTANTE: `chess` debe estar en TU turno (antes de mover tú).
+ * Devuelve tu movimiento defensivo óptimo si existe amenaza de jaque (JAQUE INMEDIATO del rival tras tu jugada).
+ * Si NO hay amenaza (según umbral), devuelve null.
  */
-export default function MovimientoDefensivoContraJaque(
+export default function MovimientoDefensivoContraJaqueClaro(
   chess: Chess,
-  profundidad: number,
-  slice: number
+  slice: number,
+  umbral: number = 0.25 // “probabilidad”: % de tus jugadas que permiten un jaque inmediato del rival
 ): Move | null {
   if (chess.isGameOver()) return null;
 
-  // 1) Amenaza actual (rival tras tu “no-move” => no podemos pasar turno, así que aproximamos):
-  //    Evaluamos amenaza del rival DESPUÉS de cada jugada tuya y buscamos si existe alguna que la “active”.
-  //    Mejor criterio: comparamos el mejor “anti” vs el promedio; pero aquí lo simple:
   const myMoves = chess.moves({ verbose: true });
   if (myMoves.length === 0) return null;
 
-  // 2) Para cada jugada tuya, medimos la mejor amenaza de jaque del rival en la posición resultante.
-  //    Queremos MINIMIZAR esa amenaza.
-  let bestDefense: { m: Move; threatScore: number; rivalHasCheckThreat: boolean } | null = null;
-
-  for (const m of myMoves) {
+  // 1) Medimos, para cada jugada tuya, cuántos JAQUES inmediatos tiene el rival y cuán peligrosos son.
+  const evals = myMoves.map((m) => {
     const afterMy = new Chess(m.after); // ahora mueve el rival
-    const threat = bestCheckThreat(afterMy, profundidad, slice);
+    const info = immediateCheckReplies(afterMy, slice);
+    return { m, ...info };
+  });
 
-    const candidate = { m, threatScore: threat.score, rivalHasCheckThreat: threat.givesCheckSoon };
-
-    if (!bestDefense) {
-      bestDefense = candidate;
-      continue;
-    }
-
-    // Prioridad: primero elimina amenaza (givesCheckSoon=false), luego menor score
-    if (bestDefense.rivalHasCheckThreat && !candidate.rivalHasCheckThreat) {
-      bestDefense = candidate;
-      continue;
-    }
-    if (bestDefense.rivalHasCheckThreat === candidate.rivalHasCheckThreat) {
-      if (candidate.threatScore < bestDefense.threatScore) {
-        bestDefense = candidate;
-      }
-    }
-  }
-
-  if (!bestDefense) return null;
-
-  // 3) ¿“Existe probabilidad de jaque”? => si en la mayoría de jugadas el rival amenaza.
-  //    Versión simple: si incluso la mejor defensa sigue teniendo amenaza fuerte, igual es inevitable.
-  //    Para tu frase, devolvemos defensa solo si había amenaza en general:
-  const amenazas = myMoves.reduce((acc, m) => {
-    const t = bestCheckThreat(new Chess(m.after), profundidad, slice);
-    return acc + (t.givesCheckSoon ? 1 : 0);
-  }, 0);
-
-  const hayAmenaza = amenazas > Math.floor(myMoves.length * 0.25); // umbral (tócalo)
+  // 2) ¿Existe amenaza real? => en cuántas de tus jugadas el rival tiene al menos un jaque inmediato.
+  const amenazas = evals.reduce((acc, e) => acc + (e.count > 0 ? 1 : 0), 0);
+  const hayAmenaza = amenazas > Math.floor(myMoves.length * umbral);
   if (!hayAmenaza) return null;
 
-  return bestDefense.m;
+  // 3) Elegimos la mejor defensa:
+  //    Prioridad: (a) dejar 0 jaques, (b) minimizar cantidad de jaques, (c) minimizar el peor jaque.
+  evals.sort((a, b) => {
+    if (a.count === 0 && b.count !== 0) return -1;
+    if (b.count === 0 && a.count !== 0) return 1;
+
+    if (a.count !== b.count) return a.count - b.count;
+    return a.worst - b.worst;
+  });
+
+  return evals[0].m;
 }

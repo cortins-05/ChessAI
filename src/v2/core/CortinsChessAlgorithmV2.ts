@@ -9,6 +9,8 @@ import { FiltradoDefensaV2 } from '../engine/filter/Defensa';
 import { filterKingNotAdjacentToEnemyKing } from '../utils/KingSquares';
 import { PIECE_VALUE, RetornaDesarrollo } from '../types/types';
 import ordenPorRiesgo from '../engine/order/Riesgo';
+import PredecirJaqueRival from '../engine/analisys/PredecirJaque';
+import MovimientoDefensivoContraJaque from '../engine/analisys/PredecirJaque';
 
 
 export class CortinsChessAlgorithmV2 {
@@ -128,6 +130,15 @@ export class CortinsChessAlgorithmV2 {
             };
         }
 
+        const movimientoContraJaque = MovimientoDefensivoContraJaque(chess,4,4);
+
+        if(movimientoContraJaque){
+            return {
+                code: "MOVIMIENTO DEFENSIVO CONTRA JAQUE",
+                san: movimientoContraJaque.san
+            }
+        }
+
         if(defensasPosibles.ImplicanAtaqueSinRiesgo.length>0){
             const movimiento = defensasPosibles.ImplicanAtaqueSinRiesgo;
             if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
@@ -156,6 +167,19 @@ export class CortinsChessAlgorithmV2 {
                 }
             }
             
+        }else if(ataquesPosibles.PorRiesgoOrdenados.length>0){
+            const movimiento = ataquesPosibles.PorRiesgoOrdenados;
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
+                move = {
+                    san: movimiento[1].san,
+                    code: "ATAQUES POR RIESGO ORDENADOS"
+                }
+            }else{
+                move = {
+                    san: movimiento[0].san,
+                    code: "ATAQUES POR RIESGO ORDENADOS"
+                }
+            }
         }else if(defensasPosibles.BrutasOrdenadas.length>0){
             const movimiento = defensasPosibles.BrutasOrdenadas;
             if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
@@ -173,19 +197,6 @@ export class CortinsChessAlgorithmV2 {
             move = {
                 san: this.ataqueCompuesto.shift()!.san,
                 code: "ATAQUE COMPUESTO"
-            }
-        }else if(ataquesPosibles.PorRiesgoOrdenados.length>0){
-            const movimiento = ataquesPosibles.PorRiesgoOrdenados;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
-                move = {
-                    san: movimiento[1].san,
-                    code: "ATAQUES POR RIESGO ORDENADOS"
-                }
-            }else{
-                move = {
-                    san: movimiento[0].san,
-                    code: "ATAQUES POR RIESGO ORDENADOS"
-                }
             }
         }
 

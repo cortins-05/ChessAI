@@ -1,7 +1,10 @@
 import { Move, Chess } from 'chess.js';
 import { PIECE_VALUE } from '../../types/types';
 import InvertirColor from '../../utils/ColorInverso';
-import { piezasAtacadasPor } from '../../utils/PiezasAtacadas';
+import { piezasAtacadasPor, PiezasDefiendenSquare } from '../../utils/PiezasAtacadas';
+import { ordenPorCalidadPiezaSimbolo } from '../order/Calidad';
+
+
 
 export function FiltradoDefensaV2(move: Move) {
   const chessAntes = new Chess(move.before);
@@ -13,15 +16,30 @@ export function FiltradoDefensaV2(move: Move) {
   const piezasMiasAtacadasAntes = piezasAtacadasPor(chessAntes,colorContrario);
   const piezasAtacadasDespues = piezasAtacadasPor(chessDespues,colorContrario);
 
+  const defensores = PiezasDefiendenSquare(chessDespues,move.to);
+
+  const defensorMasBarato = defensores.length>0
+  ? Math.min(...defensores.map(d => PIECE_VALUE[d.piece.type]))
+  : null;
+
   const valorAntes = piezasMiasAtacadasAntes.reduce((a,p)=>a+PIECE_VALUE[p.PiezaSimbolo],0);
   const valorDespues = piezasAtacadasDespues.reduce((a,p)=>a+PIECE_VALUE[p.PiezaSimbolo],0);
   const mejora = valorAntes - valorDespues;
 
-  if (PIECE_VALUE[move.piece] >= 5 && chessDespues.isAttacked(move.to, colorContrario)) {
-    return false;
-  }
-
   if (mejora <= 0) return false;
+
+  const quedaAtacado = chessDespues.isAttacked(move.to, colorContrario);
+
+  if (PIECE_VALUE[move.piece] >= 5 && quedaAtacado) {
+    if (defensorMasBarato === null) return false;
+
+    if (
+      defensorMasBarato !== null &&
+      defensorMasBarato - PIECE_VALUE[move.piece] >= 4
+    ) {
+      return false;
+    }
+  }
 
   if (
     (piezaTo && PIECE_VALUE[move.piece] < PIECE_VALUE[piezaTo.type]) ||
@@ -30,5 +48,5 @@ export function FiltradoDefensaV2(move: Move) {
     return true;
   }
 
-  return false;
+  return true;
 }

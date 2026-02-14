@@ -64,7 +64,7 @@ export class CortinsChessAlgorithmV2 {
         console.log(probabilidadJaque);
 
         if(probabilidadJaque>=3){
-            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:4,slice:3});
+            this.jugadasJaqueMate = JugadasJaqueMate({moves,profundidad:5,slice:4});
         }
 
         if (this.jugadasJaqueMate && this.jugadasJaqueMate.length > 0) {

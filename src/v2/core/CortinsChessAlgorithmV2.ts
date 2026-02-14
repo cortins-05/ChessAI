@@ -203,7 +203,5 @@ export class CortinsChessAlgorithmV2 {
             san: movimiento_restante.san,
             code: "MOVIMIENTO DE PEONES O LO QUE QUEDE"
         }
-
-        return this.randomMove(chess);
     }
 }

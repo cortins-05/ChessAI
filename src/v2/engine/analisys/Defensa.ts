@@ -3,6 +3,7 @@ import { Defensas } from '../../types/types';
 import { ordenarPorCalidadPieza } from '../order/Calidad';
 import { FiltradoDefensaV2 } from '../filter/Defensa';
 import InvertirColor from '../../utils/ColorInverso';
+import ordenPorRiesgo from '../order/Riesgo';
 
 export default function defensaV2(moves:Move[]):Defensas{
 
@@ -30,7 +31,13 @@ export default function defensaV2(moves:Move[]):Defensas{
         }
     }
 
-    defensas_brutas.sort(ordenarPorCalidadPieza);
+    defensas_brutas
+    .sort((a, b) => {
+        const riesgo = ordenPorRiesgo(a, b);
+        if (riesgo !== 0) return riesgo;
+
+        return ordenarPorCalidadPieza(a,b);
+    })[0];
 
     const defensas_sin_riesgo = defensas_brutas.filter(FiltradoDefensaV2);
     const defensas_con_ataque = defensas_brutas.filter(def=> def.captured!==undefined);

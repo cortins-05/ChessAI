@@ -3,13 +3,13 @@ import { randomMove } from "../engine/strategies/random.strategy";
 import defensaV2 from '../engine/analisys/Defensa';
 import ataqueV2 from '../engine/analisys/Ataque';
 import isValidMove from '../utils/ValidMove';
-import JugadasJaqueMate from '../engine/analisys/JaqueMate';
+import JugadasJaqueMate from '../engine/analisys/AtaqueJaqueMate';
 import { ContarPiezasTotales } from '../utils/ContarPiezas';
 import { FiltradoDefensaV2 } from '../engine/filter/Defensa';
 import { filterKingNotAdjacentToEnemyKing } from '../utils/KingSquares';
 import { PIECE_VALUE, RetornaDesarrollo } from '../types/types';
 import ordenPorRiesgo from '../engine/order/Riesgo';
-import MovimientoDefensivoContraJaque from '../engine/analisys/PredecirJaque';
+import { PredecirMateEn2 } from '../engine/analisys/DefensaJaqueMate';
 
 
 export class CortinsChessAlgorithmV2 {
@@ -36,9 +36,27 @@ export class CortinsChessAlgorithmV2 {
     }
 
     public CortinsMoveV2(chess:Chess):RetornaDesarrollo{
+        const legalMoves = chess.moves({verbose:true}) as Move[];
+        const fallbackLegalMove = legalMoves[0];
+
+        if (!fallbackLegalMove) {
+            return {
+                san: "",
+                code: "SIN_MOVIMIENTOS_LEGALES"
+            };
+        }
+
+        const amenazaMate2 = PredecirMateEn2(chess, this.colorRival);
+        
+        if (amenazaMate2?.defensaEjemplo && isValidMove(chess.fen(), amenazaMate2.defensaEjemplo.san)) {
+            return {
+                code: "DEFENSA MATE EN 2",
+                san: amenazaMate2.defensaEjemplo.san
+            }
+        }
 
         let move:RetornaDesarrollo|undefined;
-        let moves = chess.moves({verbose:true});
+        let moves = [...legalMoves];
 
         const lastUci = this.ultimosUci[this.ultimosUci.length - 1];
         const prevUci = this.ultimosUci[this.ultimosUci.length - 2];
@@ -110,8 +128,9 @@ export class CortinsChessAlgorithmV2 {
         }
 
         const posicion_rey = chess.findPiece(rey);
+        let piezas_inmoviles:Square[];
         const chessCopy = new Chess(chess.fen());
-        const piezas_inmoviles = chessCopy.moves({square:posicion_rey[0],verbose:true}).map(mov => mov.to);
+        piezas_inmoviles = chessCopy.moves({square:posicion_rey[0],verbose:true}).map(mov => mov.to);
 
         if (chess.inCheck()) {
             if (defensasPosibles.PorRiesgoOrdenadas.length > 0) {
@@ -123,18 +142,9 @@ export class CortinsChessAlgorithmV2 {
 
             // si no hay defensa "segura", al menos sal del jaque
             return {
-                san: moves[0].san,
+                san: fallbackLegalMove.san,
                 code: "SALIDA DE JAQUE FORZADA"
             };
-        }
-
-        const movimientoContraJaque = MovimientoDefensivoContraJaque(chess,3,3);
-
-        if(movimientoContraJaque){
-            return {
-                code: "MOVIMIENTO DEFENSIVO CONTRA JAQUE",
-                san: movimientoContraJaque.san
-            }
         }
 
         if(defensasPosibles.ImplicanAtaqueSinRiesgo.length>0){
@@ -165,19 +175,6 @@ export class CortinsChessAlgorithmV2 {
                 }
             }
             
-        }else if(ataquesPosibles.PorRiesgoOrdenados.length>0){
-            const movimiento = ataquesPosibles.PorRiesgoOrdenados;
-            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
-                move = {
-                    san: movimiento[1].san,
-                    code: "ATAQUES POR RIESGO ORDENADOS"
-                }
-            }else{
-                move = {
-                    san: movimiento[0].san,
-                    code: "ATAQUES POR RIESGO ORDENADOS"
-                }
-            }
         }else if(defensasPosibles.BrutasOrdenadas.length>0){
             const movimiento = defensasPosibles.BrutasOrdenadas;
             if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
@@ -196,10 +193,24 @@ export class CortinsChessAlgorithmV2 {
                 san: this.ataqueCompuesto.shift()!.san,
                 code: "ATAQUE COMPUESTO"
             }
+        }else if(ataquesPosibles.PorRiesgoOrdenados.length>0){
+            const movimiento = ataquesPosibles.PorRiesgoOrdenados;
+            if(this.ultimosUci&&this.ultimosUci.length>0&&movimiento[0].san==lastUci&&movimiento.length>1){
+                move = {
+                    san: movimiento[1].san,
+                    code: "ATAQUES POR RIESGO ORDENADOS"
+                }
+            }else{
+                move = {
+                    san: movimiento[0].san,
+                    code: "ATAQUES POR RIESGO ORDENADOS"
+                }
+            }
         }
 
         if(move?.san&&!isValidMove(chess.fen(),move.san)){
             console.log("Movimiento invalido",move.code,move.san);
+            move = undefined;
         }
 
         if(move){
@@ -207,13 +218,21 @@ export class CortinsChessAlgorithmV2 {
             return move
         };
 
-        const movimiento_restante = moves
+        const pool = moves.length > 0 ? moves : legalMoves;
+        const movimiento_restante = [...pool]
         .sort((a, b) => {
             const riesgo = ordenPorRiesgo(a, b);
             if (riesgo !== 0) return riesgo;
 
             return PIECE_VALUE[a.piece] - PIECE_VALUE[b.piece];
         })[0];
+
+        if (!movimiento_restante) {
+            return {
+                san: fallbackLegalMove.san,
+                code: "FALLBACK_LEGAL"
+            };
+        }
 
         this.ultimosUci.push(movimiento_restante.san);
 
